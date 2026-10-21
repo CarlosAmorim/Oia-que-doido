@@ -1,0 +1,2508 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Portfolio</title>
+
+
+
+        <!-- Estilos específicos desta página. O restante continua usando styles.css. -->
+    <style>
+        .pagina-ideia-fixa {
+            padding: 125px 2rem 5rem;
+            text-align: center;
+        }
+
+        .ideia-introducao {
+            width: min(100%, 900px);
+            margin: 0 auto 2.5rem;
+            text-align: center;
+            color: var(--claro);
+            line-height: 1.8;
+            font-size: clamp(1rem, 1.3vw, 1.2rem);
+        }
+
+        .ideia-titulo {
+            text-align: center;
+            margin: 0 0 1rem;
+        }
+
+        .ideia-galeria {
+            width: min(100%, 1400px);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 1.5rem;
+        }
+
+        .ideia-item {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid var(--vidro);
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(8px);
+            transition: transform .25s ease, box-shadow .25s ease;
+        }
+
+        .ideia-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(79, 70, 229, .22);
+        }
+
+        .ideia-imagem {
+            display: block;
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            cursor: zoom-in;
+        }
+
+        .ideia-midia {
+            border: 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(164,248,242,.96), rgba(29,234,87,.9));
+            color: #202020;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: .8rem;
+            text-align: center;
+            font: inherit;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+        }
+        .ideia-midia-icone { font-size: 1.25rem; font-weight: 800; }
+        .ideia-midia-nome { font-size: .85rem; }
+
+        .ideia-legenda {
+            padding: 1rem;
+            color: var(--claro);
+            text-align: center;
+        }
+
+
+
+
+
+
+        /* Visualizador de imagem em tela cheia */
+        .visualizador {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 64px 70px;
+            background: rgba(0, 0, 0, .94);
+        }
+
+        .visualizador.aberto {
+            display: flex;
+        }
+
+        /* O atributo hidden precisa prevalecer sobre display:block dos estilos dos players. */
+        .visualizador [hidden] { display: none !important; }
+
+.visualizador-conteudo {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+    background: transparent;
+    border-radius: 10px;
+
+    box-sizing: border-box;
+}
+
+        .visualizador-conteudo.fundo-png { background: #d2dcda; padding: 12px; }
+        /* Mantém os conteúdos centralizados dentro da área do modal. */
+
+        .visualizador-video, .visualizador-pdf {
+            display: block;
+            flex: 0 1 auto;
+            border: 0;
+            border-radius: 8px;
+            background: #181818;
+        }
+        .visualizador-video {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .visualizador-pdf {
+            width: min(100%, 1100px);
+            height: 100%;
+            max-height: 100%;
+        }
+        .visualizador-vrm {
+            flex: 0 1 auto;
+            width: min(100%, 1100px);
+            height: 100%;
+            min-height: 320px;
+            overflow: hidden;
+            border-radius: 8px;
+            background: #20232a;
+        }
+        .visualizador-vrm canvas { display: block; width: 100%; height: 100%; }
+        .visualizador-aviso { color: white; padding: 1.5rem; text-align: center; }
+
+/* Imagem ajustada à tela */
+.visualizador-imagem {
+    display: block;
+    flex: 0 0 auto;
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    cursor: zoom-in;
+}
+
+/* Imagem em resolução original */
+.visualizador-conteudo:has(.visualizador-imagem.zoom-original) {
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.visualizador-imagem.zoom-original {
+    max-width: none;
+    max-height: none;
+    width: auto;
+    height: auto;
+    object-fit: initial;
+    margin: 0;
+    cursor: zoom-out;
+}
+
+        .visualizador-botao {
+            position: absolute;
+            z-index: 2;
+            border: 1px solid rgba(255,255,255,.35);
+            border-radius: 999px;
+            background: rgba(30,30,30,.8);
+            color: white;
+            padding: .7rem 1rem;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .visualizador-botao:hover {
+            background: rgba(80,80,80,.95);
+        }
+
+        .visualizador-fechar { top: 16px; right: 18px; font-size: 1.4rem; }
+        .visualizador-zoom { top: 18px; left: 18px; }
+        .visualizador-anterior { left: 16px; top: 50%; transform: translateY(-50%); }
+        .visualizador-proxima { right: 16px; top: 50%; transform: translateY(-50%); }
+        .visualizador-contador {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: .95rem;
+            background: rgba(0,0,0,.55);
+            padding: .4rem .8rem;
+            border-radius: 999px;
+        }
+
+        @media (max-width: 900px) {
+            .ideia-galeria { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .ideia-imagem { height: 230px; }
+        }
+
+        @media (max-width: 600px) {
+            .pagina-ideia-fixa { padding: 110px 1rem 3rem; }
+            .ideia-galeria { grid-template-columns: 1fr; gap: 1rem; }
+            .ideia-imagem { height: auto; max-height: 360px; object-fit: contain; }
+            .visualizador { padding: 70px 12px; }
+            .visualizador-anterior { left: 8px; }
+            .visualizador-proxima { right: 8px; }
+            .visualizador-botao { padding: .6rem .75rem; }
+        }
+    </style>
+</head>
+<body>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  <script>
+<!--Fundo com degradê-->
+            const corAzul = [164, 248, 242];   // Azul-claro
+const corVerde = [29, 234, 87];    // Verde-claro
+
+const azulInicial = [215, 255, 252];
+const verdeFinal = [190, 255, 205];
+
+function misturarCores(corA, corB, progresso) {
+    const resultado = corA.map((valor, i) =>
+        Math.round(valor + (corB[i] - valor) * progresso)
+    );
+
+    return `rgb(${resultado.join(", ")})`;
+}
+
+function atualizarGradiente() {
+    const alturaRolagem =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+    const progresso = alturaRolagem > 0
+        ? Math.min(window.scrollY / alturaRolagem, 1)
+        : 0;
+
+    const inicio = misturarCores(corAzul, corVerde, progresso);
+    const fim = misturarCores(azulInicial, verdeFinal, progresso);
+
+    document.documentElement.style.setProperty("--cor-inicio", inicio);
+    document.documentElement.style.setProperty("--cor-fim", fim);
+}
+
+window.addEventListener("scroll", atualizarGradiente, { passive: true });
+window.addEventListener("resize", atualizarGradiente);
+
+atualizarGradiente();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<body>
+<nav class="navegacao" aria-label="Navegação principal"><ul class="menu">
+<li><a class="menu-link" href="index.html">Início</a></li>
+<li><a class="menu-link" href="#adesivos">Adesivos</a></li>
+<li><a class="menu-link" href="#identidades-visuais">Identidades Visuais</a></li>
+<li><a class="menu-link" href="#ilustracoes">Ilustrações</a></li>
+<li><a class="menu-link" href="#3d">3D</a></li>
+<li><a class="menu-link" href="#videos">Vídeos</a></li>
+<li><a class="menu-link" href="#fotos">Fotos</a></li>
+<li><a class="menu-link" href="#desenhos">Desenhos</a></li>
+<li><a class="menu-link" href="#outros">Outros</a></li>
+</ul></nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+
+1_Adesivos
+    - Ideia Fixa Sinalização (imagens, vídeos) +add instagram
+    - Placas individuais com referências (imagens)
+    - Personagem vetorizado feito na UFU (imagem)
+-->
+
+    <main id="adesivos" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Adesivos</h1>
+        <p class="ideia-introducao">
+        Uma seleção de trabalhos desenvolvidos na área de criação gráfica, 
+        desde a elaboração e vetorização das artes no CorelDRAW até a plotagem dos adesivos 
+        e sua aplicação em diferentes superfícies.      
+        </p>
+
+                <h3 class="sobre-subtitulo">Ideia Fixa Sinalização</h3>
+                 <p class="sobre-paragrafo">
+            Projetos e registros do período entre 2023 a 2026 em que trabalhei na Ideia Fixa Sinalização
+            como Arte Finalista. Foram utilizados adesivos refletivos prismáticos e de grau engenharia 
+            para a plotagem, já para a aplicação era utilizado placas de ACM ou de aço já com as bordas 
+            lixadas e com o verso pintado. As chapas eram previamente limpas com solvente e álcool para receber o adesivo
+            de fundo, das orlas e dos pictogramas que eram aplicados com a ajuda de uma máscara e marcações a caneta,
+            que posteriormente era apagados ao limpar com álcool e água.
+                 </p>
+                 <p class="sobre-paragrafo">
+            Clique para visualizar em tela cheia. 
+            </p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/IdFixaFoto (1).JPG" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Placa de Quilometragem</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/IdFixaFoto (2).JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Placa Urbana</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/IdFixaFoto (3).JPG" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Placa em Condomínio</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/IdFixaFoto (4).JPG" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização viária</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/IdFixaFoto (5).JPG" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+
+<!--formato pdf-->
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-pdf-thumbnail"
+        type="button"
+        data-media-src="./img/1_Adesivos/Toponimicas.pdf"
+        data-media-type="pdf"
+        aria-label="Abrir Material de sinalização">
+
+        <img
+            class="ideia-pdf-preview"
+            src="./img/1_Adesivos/TopoCapa.png"
+            alt="Prévia do documento de sinalização"
+            loading="lazy">
+
+        <span class="ideia-pdf-icone" aria-hidden="true">PDF</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Placas Toponímicas
+    </figcaption>
+</figure>
+
+
+<!--formato mp4-->
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/1_Adesivos/IdFixaVideos (1).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/1_Adesivos/IdFixaVideos (1).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Toponímicas implantadas
+    </figcaption>
+</figure>
+
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/1_Adesivos/IdFixaVideos (2).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/1_Adesivos/IdFixaVideos (2).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Diversas placas finalizadas
+    </figcaption>
+</figure>
+
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/1_Adesivos/IdFixaVideos (3).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/1_Adesivos/IdFixaVideos (3).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Encomenda feita
+    </figcaption>
+</figure>
+
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/1_Adesivos/IdFixaVideos (4).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/1_Adesivos/IdFixaVideos (4).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Placas implantadas
+    </figcaption>
+</figure>
+
+        </section>
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>             
+
+
+                        <h3 class="sobre-subtitulo">Placas</h3>
+                                  <p class="sobre-paragrafo">
+        Algumas encomendas ou presentes feitos no ano de 2025 a partir da plotagem de adesivos e aplicados sobre uma placas de ACM ou acrílico.
+        A maioria com referências a animes ou bandas famosas, e um de premiação.
+            </p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/Placas (1).JPG" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Death Note</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/Placas (2).JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Premiação de aniversário</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/Placas (3).JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Itachi do Naruto</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/Placas (4).JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sasuke do Naruto</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/Placas (5).JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Red Hot Chilli Peppers</figcaption>
+            </figure>
+        </section>
+    </main>
+
+
+    
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+2_IdVisuais
+    - LEB:  (imagens) +add instagram
+        .Logotipo
+        .Capa de Disco
+        .Diagramação para CD 
+    - Meu Logotipo (imagens)
+    - Olho de Peixe, trabalho feito para Calourada na UFU (imagens) +add instagram
+    - Raposa negra palheiros (imagem)
+    - Cervejarias:  
+        .Catacavaco (imagens, vídeos) +add instagram
+        .Cerveja Garrucheira (imagens, vídeos) +add instagram
+    - Capa livro Libertália (imagens)
+    - Testes de logotipo para orbita studio (imagens)
+-->
+    <main id="identidades-visuais" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Identidades Visuais</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos realizados na área de comunicação visual e arte-final,
+            reunindo projetos e registros pessoais e dos clientes. Os softwares utilizados na 
+            elaboração das artes foram o Photoshop, CorelDRAW e Illustrator.
+        </p>
+
+                        <h3 class="sobre-subtitulo">Artes para a LEB</h3>
+                          <p class="sobre-paragrafo">
+            Sou integrante da banda LEB (Liberté Experience Band) como artista visual desde 2017. Com essa 
+            oportunidade pude experimentar a elaboração do logotipo, da capa e da diagramação dos discos.        
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[12_LEB (1).png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logo da banda</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[11_LEB (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Capa do disco</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[12_Leb (2).png" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Diagramação do CD</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[12_Leb (3).png" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Acústico</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[12_Leb (4).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Ao vivo</figcaption>
+            </figure>
+        </section>
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+                        <h3 class="sobre-subtitulo">Meu Logotipo</h3>
+                          <p class="sobre-paragrafo">
+            O logotipo que eu criei com o intúito de representar minha identidade e assinatura 
+            em obras criadas digitalmente. O formato instiga a visualização e interpretação de uma criatura
+            e ao mesmo tempo da letra "C", que é a inicial do meu nome. 
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/LOGOTIP2.png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logo e perfil do instagram</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/[5_LOGOTIP.png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logotipo</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Lgo22.png" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Logotipo atual</figcaption>
+            </figure>
+        </section>
+
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+
+                        <h3 class="sobre-subtitulo">Empresa Júnior Olho de Peixe</h3>
+                          <p class="sobre-paragrafo">
+            Fiz parte da EJ olho de peixe entre anos de 2017 e 2018. Com o cargo de Diretor de Projetos, era incumbido
+            de entrar em contato e receber os clientes nas reuniões para tirar o brieffing e distribuir a tarefa para 
+            os responsáveis. Além disso, ajudava no trabalho em equipe na elaboração de logotipos, identidades visuais, 
+            pôsteres, banners, rótulos, capas, ilustrações de personagens e cenários, entre outras atividades da área 
+            artística e design.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2017_olhodepeixe (1).jpeg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logo da EJ com a equipe</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2017_Ejzoi (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Banners do evento</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2017_Ejzoi (2).jpg" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Calorada UFU</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2017_Ejzoi (3).jpg" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Gente é pra Brilhar</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2017_Ejzoi (4).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Em Cartaz</figcaption>
+            </figure>
+        </section>
+
+
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+        
+            <h3 class="sobre-subtitulo">Raposa Negra Palheiros</h3>
+            <p class="sobre-paragrafo">
+            Trabalho realizado para uma marca de palheiros em 2020 que tinha fabricação caseira.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/2020_palheiros.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Identidade Visual</figcaption>
+            </figure>
+        </section>
+
+
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+
+                        <h3 class="sobre-subtitulo">Cervejarias</h3>
+                          <p class="sobre-paragrafo">
+            Serviço realizado para marcas de cervejas em 2020 que tinham fabricações caseiras. Catacavaco e Garrucheira
+            me encomendaram a elaboração dos rótulos e das gravatas para cada sabor de suas produções de cerveja.
+            </p>
+
+
+  
+
+                    <p class="cerveja"><strong>Catacavaco:</strong></p>
+                    <p class="sobre-paragrafo"></p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/2_IdVisuais/Catacavaco (1).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/2_IdVisuais/Catacavaco (1).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+    Enchendo o copo e ouvindo Pagode
+    </figcaption>
+    </figure>
+
+    <figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/2_IdVisuais/Catacav.mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/2_IdVisuais/Catacav.mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Sextou
+    </figcaption>
+    </figure>
+
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Rótulos Antigos</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (1).png" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Rótulos Remodelados</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (3).jpg" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Fila de Produção</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (5).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Irish Red Ale</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (6).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">American IPA</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (7).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Cream Ale</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (9).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">American Blonde Ale</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Catacavaco (10).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">American Brown Ale</figcaption>
+            </figure>
+        </section>
+
+            <p class="sobre-paragrafo"></p>      
+                    <p class="cerveja"><strong>Garrucheira:</strong></p>
+                    <p class="sobre-paragrafo"></p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+
+    <figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/2_IdVisuais/Garrucha (2).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/2_IdVisuais/Garrucha (2).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Apresentação com música
+    </figcaption>
+    </figure>
+
+        <figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/2_IdVisuais/Garrucheira (1).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/2_IdVisuais/Garrucheira (1).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Dica ao encher o copo
+    </figcaption>
+    </figure>
+    
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/GarrucheiraFoto (2).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Produção em massa</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/GarrucheiraFoto (4).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Copo Cheio</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/GarrucheiraFoto (5).jpg" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">As Três Marias</figcaption>
+            </figure>
+
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Garrucheira (4).jpg" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">American Pale Ale</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Garrucheira (10).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Pilsen</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Garrucheira (7).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Red Ale</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Garrucheira (2).jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Indian Pale Ale</figcaption>
+            </figure>
+                <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/GarrucheiraGravatas.png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Gravatas</figcaption>
+            </figure>
+        </section>
+
+
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+                        <h3 class="sobre-subtitulo">Capa do livro Libertália</h3>
+                          <p class="sobre-paragrafo">
+            Arte criada com a técnica de pintura digital para o livro Libertália no ano de 2021.
+
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/Libertália4.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Capa do Livro</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/LivrosLibertalia.jpeg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Exemplares impressos</figcaption>
+            </figure>
+        </section>
+
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+        
+            <h3 class="sobre-subtitulo">Órbita Studios</h3>
+                          <p class="sobre-paragrafo">
+            Uma empresa de arte e comunicação visual criada por um amigo e eu no ano de 2023.
+            Segue estudos para a construção da logomarca própria.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/OrbitaStudio (12).png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logo Órbita Studio</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/OrbitaStudio (11).png" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Logo Disco de Vinil</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/OrbitaStudio (2).png" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Logo com aspas</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/OrbitaStudio (3).png" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Logo com anel</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/2_IdVisuais/OrbitaStudio (8).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Logo Lua</figcaption>
+            </figure>
+        </section>
+
+
+    </main>
+
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+3_Ilustrações
+    - Cartas de baralho (imagens)
+    - Pintura digital em exposição bomberman (imagens)
+    - LogoCoroa vetor (imagem)
+    - Et varias cores (imagens, gif)
+    - Pinturas digitais com fundo/quase com/sem fundo (imagens)
+  -->
+
+    <main id="ilustracoes" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Ilustrações</h1>
+        <p class="ideia-introducao">
+            Uma seleção de artes que foram criadas sem fins lucrativos. Seja para 
+            evolução pessoal ou trabalho de curso utilizando os programas Photoshop e 
+            CorelDRAW.
+        </p>
+
+                                <h3 class="sobre-subtitulo">Cartas de Baralho</h3>
+                          <p class="sobre-paragrafo">
+            Jogo de cartas com um personagem diferente para cada número, representando assim tanto os 
+            planetas do Sistema Solar respectivamente quanto as características dos Deuses Gregos
+            e Romanos. Cada carta também apresenta uma pose ou ação diferente para cada nipe do baralho.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2017_card (1).png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Cartas na mão</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/7 mit1.png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Mercúrio é Hermes. Venus é Afrodite</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2017_card (2).png" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda"> Telo é Gaia. Marte é Ares </figcaption>
+                            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2017_card (3).png" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Jupter é Zeus. Saturno é Kronos</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2017_card (4).png" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Urano é céu. Netuno é Posseidom</figcaption>
+            </figure>
+        </section>
+
+            <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+                        <h3 class="sobre-subtitulo">Pinturas Digitais</h3>
+                        <p class="sobre-paragrafo">
+            Nesta seleção de trabalhos contém o processo de criação, o resultado final e uma série 
+            de personagens feitos em uma mesa digitalizadora utilizando o Photoshop.
+
+            </p>
+            
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2015_bomberman (1).png" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Processo artístico</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2015_bomberman (3).jpg" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Bomberman</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/BondadeProcess.jpg" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Processo de Produção</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_dogboy.JPG" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Garoto cego e cão guia</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_pirata.JPG" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">O Pirata</figcaption>
+            </figure>
+            
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Atlantianos (1).PNG" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Tritão Tubarão</figcaption>
+            </figure>
+                            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Atlantianos (2).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Tritão Golfinho</figcaption>
+            </figure>
+                            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Atlantianos (3).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Tritão Polvo</figcaption>
+            </figure>
+    
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Atlantianos (4).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Tritão Verde</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Atlantianos (5).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Tritão Claro</figcaption>
+            </figure>
+
+                <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_aguavivo.PNG" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Homem Água-Viva</figcaption>
+            </figure>
+                 <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_lemonorange.png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Lemon boy & Orange girl</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/Personagem.png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Exoesquelético</figcaption>
+            </figure>            
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_peixelua.jpg" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Peixe Lua</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2025_coco.png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Pixel Art: Coqueiro Torto</figcaption>
+            </figure>
+
+        </section>
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+                          <h3 class="sobre-subtitulo">Vetorização</h3>
+                          <p class="sobre-paragrafo">
+            Trabalhos criados em vetor, que são imagens criadas de forma geométrica e matemática para preservar a qualidade ao ampliar.
+            </p>
+            
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2018_logocoroa.png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Reflexo</figcaption>
+            </figure>
+                <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/1_Adesivos/2016_boitata.png" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Boitatá</figcaption>
+            </figure>
+        </section>
+        </section>
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+                                <h3 class="sobre-subtitulo">Alien</h3>
+                          <p class="sobre-paragrafo">
+            Esta reprodução gráfica digital de um alienigena têm como referência as obras de 
+            serigrafia do artista Andy Warhol, que usava uma técnica de impressão industrial 
+            para remeter ao consumo de massa 
+
+            </p>
+            
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_et (1).gif" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">ET em choque</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_et (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Reprodução em massa</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_et (2).jpg" alt="Detalhe de trabalho gráfico" loading="lazy">
+                <figcaption class="ideia-legenda">Seleção de alguns</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_et (3).png" alt="Peça gráfica produzida na Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Em fila</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/3_Ilustrações/2019_et (1).png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Um exemplar</figcaption>
+            </figure>
+        </section>
+
+    </main>
+
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+4_3d
+    - 2 Avatar (vrm, imagem)
+    - jogo do curso na etec (imagem, gif, vídeo)
+
+    Para abrir o arquivo com os avatares 3d funcionando:
+    . Abra o cmd na pasta e digite:
+    python -m http.server 8000
+
+    . Abra o navegador e digite:
+    http://localhost:8000/projetos.html
+
+-->
+
+    <main id="3d" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">3D</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos tridimensionais realizados por meio computacional seja 
+            para atender um interesse próprio e para o curso
+            técnico de jogos.
+
+        </p>
+
+                          <h3 class="sobre-subtitulo">Avatares</h3>
+                          <p class="sobre-paragrafo">
+            Feito no VRoid Studio em formato VRM
+            </p>
+
+<section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+   <button
+    class="ideia-imagem ideia-midia"
+    type="button"
+    data-media-src="./img/4_3d/Zarpe.vrm"
+    data-media-type="vrm"
+    aria-label="Abrir modelo 3D"
+>
+    <span class="ideia-midia-icone">3D</span>
+    <span class="ideia-midia-nome">Personagem 1</span>
+</button>
+
+<button
+    class="ideia-imagem ideia-midia"
+    type="button"
+    data-media-src="./img/4_3d/Zigma.vrm"
+    data-media-type="vrm"
+    aria-label="Abrir modelo 3D"
+>
+    <span class="ideia-midia-icone">3D</span>
+    <span class="ideia-midia-nome">Personagem 2</span>
+</button>
+
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/4_3d/25-out-13-11-11-29-34.png" alt="Material de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Print</figcaption>
+            </figure>
+
+        </section>
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+                        <p class="sobre-paragrafo"></p>      
+                        <h3 class="sobre-subtitulo">Jogo</h3>
+                        <p class="sobre-paragrafo">
+            Algumas artes do projeto de TCC para o curso de desenvolvimento de jogos na ETEC. O trabalho
+            foi desenvolvido atraves do RPG Maker MV, que é considerada um dos maiores motores 
+            gráficos para o desenvolvimento de jogos de RPG. O gráfico era em forma de pixel, mas 
+            adicionamos alguns Plugins para ampliar os recursos padrão da engine, tornando assim o jogo em 2,5D.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/4_3d/JogoLixo.gif" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Folder com Kinegram</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/4_3d/Jogo (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Imagem Divulgação</figcaption>
+            </figure>
+
+            <figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/4_3d/Jogo (1).mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/4_3d/Jogo (1).mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Game Play
+    </figcaption>
+</figure>
+
+        </section>
+
+
+    </main>
+
+
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+5_Videos
+    - Animação do tcc ufu (vídeo)
+    - Animação curso ufu (vídeo)
+    - Testes de animação (gifs)
+  -->
+
+    <main id="videos" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Vídeos Animações</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos realizados na área de comunicação visual e arte-final,
+            reunindo projetos e registros do período em que trabalhei na Ideia Fixa Sinalizações.
+            Clique em qualquer imagem para visualizá-la em tela cheia.
+        </p>
+
+                          <h3 class="sobre-subtitulo">Tcc da UFU</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+<!--formato mp4-->
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/5_Videos/LendaMP4.mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/5_Videos/LendaMP4.mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Material de sinalização
+    </figcaption>
+</figure>
+
+
+
+        </section>
+
+        
+                          <h3 class="sobre-subtitulo">Curso de animação UFU</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+
+<figure class="ideia-item">
+    <button
+        class="ideia-imagem ideia-midia ideia-video-thumbnail"
+        type="button"
+        data-media-src="./img/5_Videos/Talante.mp4"
+        data-media-type="video"
+        aria-label="Abrir Material de sinalização">
+
+        <video
+            class="ideia-video-preview"
+            src="./img/5_Videos/Talante.mp4"
+            preload="metadata"
+            muted
+            playsinline
+            tabindex="-1"
+            aria-hidden="true">
+        </video>
+
+        <span class="ideia-video-play" aria-hidden="true">▶</span>
+    </button>
+
+    <figcaption class="ideia-legenda">
+        Material de sinalização
+    </figcaption>
+</figure>
+        </section>
+
+        
+                          <h3 class="sobre-subtitulo">Outras animações</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/5_Videos/0 sanji.gif" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/5_Videos/espaço.gif" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/5_Videos/PuloFrames1.gif" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/5_Videos/Granxote.gif" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/5_Videos/LofiEstudanteDormindo.gif" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+    </main>
+
+    
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+6_Fotos
+    - Restauração de foto (imagem)
+    - Montagem de fotos (imagens)
+    - Revelação de foto (imagens)
+    - Outras fotos (imagens)
+-->
+
+    <main id="fotos" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Fotos</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos realizados na área de comunicação visual e arte-final,
+            reunindo projetos e registros do período em que trabalhei na Ideia Fixa Sinalizações.
+            Clique em qualquer imagem para visualizá-la em tela cheia.
+        </p>
+
+                
+                          <h3 class="sobre-subtitulo">Restauração de foto</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/AntesDepois.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/2022_fotorestauração (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/2022_fotorestauração (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+                
+                          <h3 class="sobre-subtitulo">Montagens de fotos</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/1900832_472489639544314_650848635_o.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/7 Dragonville.bmp" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/15 IMG_1920.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/39 edbird (4).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/51 edbird (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+                
+                          <h3 class="sobre-subtitulo">Revelação de fotos</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/51 udia films.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/53 paredon.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+                    <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+                
+                          <h3 class="sobre-subtitulo">Outra fotos - digital / analógicas</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/DSC_0267.JPG" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/55 rancho.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/IMG_20200112_052038.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/IMG_20190722_094222.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/6_Fotos/IMG_20190722_094013.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+    </main>
+
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+7_Desenhos
+    - Hq (imagens)
+    - Feitos a lapis (imagens)
+    - Feitos a caneta (imagens)
+-->
+
+    <main id="desenhos" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Desenhos</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos realizados na área de comunicação visual e arte-final,
+            reunindo projetos e registros do período em que trabalhei na Ideia Fixa Sinalizações.
+            Clique em qualquer imagem para visualizá-la em tela cheia.
+        </p>
+
+                        
+                          <h3 class="sobre-subtitulo">Histórias em Quadrinho</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/et rock olho e fessor.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/5 Cortar.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/11 babiel.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/76-77 hqs.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+             <!--<h3 class="sobre-subtitulo"></h3>-->
+            <p class="sobre-paragrafo"></p>      
+
+            <h3 class="sobre-subtitulo">Rabiscos</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+
+                             <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/38 dsjnsfm.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/digitalizar0006.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/58 hgvf (3).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/56 jhgvf (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/52 City zoi (2).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/74 phillips.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/75 dora.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/73 mort (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/71 peséctiv (2).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/72 capa (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/62 dinoglob.JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/30 iiaia.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/27 poaso (1).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/33 usiao.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/34 isjsdkl.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/20 jksasd.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/22 djsk.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/23 kddj (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/13-14 paglok (3).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/48 yewhn (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/coiso.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/2 inktober2020 (4).PNG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/2 inktober2020 (14).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/67 ColetteBrawl.jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/51 cai.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/51 erza.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/25 espectrarma.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/49 hackerman.png" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/66 uidjsfm (1).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/16 oiu (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/50 mke.JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/52-53 SYHIHYS.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/68 Foto0009 (2).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/50 kjfgpoirfgoj.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/bla.JPG" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/Mais um de observação no celular, não sei se é bom o anime Kino no tabe.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/9-10 robo suicid .jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/26 coracion.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/25 dances.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/1 Balões de tudo no mundo.. meio difícil xD.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/50 One Piece fake (1).jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/55 Elfo no penhasco. as folhagens da árvore não ficaram muito boas mas....jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/14 Minhas chaves.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/3 Sereia alada de quatro braços e cabelo de tentaculos com chifre.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/1 Observação na ufu.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/15 Meu apontador.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/26 Lua sinistra.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/43 Aliens em cada base voadora.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/42 Lua temporal.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/33 Movimento céu-terra.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/32 Fairy Universe.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/4 Dirigir um Autolunar.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/6 Carinha comendo cogumelos de coca cola na floresta dos portais de gnomos alienígenas.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/5 Arvore da ufu.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/7 Vaso do Shopping.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/42 Observação dos animes em revista à caneta bic xD.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/17 Batalhas.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/6 Para tempo de ação corrida.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/23 No verso de uma folha de exercícios da escola xD.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/0015 Arvore.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/22 Aliance.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/7 Dragão e sua familia.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/69 ampulhet.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/34 Reflexo na mesa de desenho (3).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/41 shark.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src="./img/7_Desenhos/12 alizar21.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+            
+        </section>
+
+    </main>
+
+
+
+
+
+<!--------------------------------------------------------------------------------------->
+
+
+
+
+
+<!--
+Organização dos meus projetos nesta próxima section:
+8_Tradicionais
+    - Pinturas:      (imagens) 
+        .Aquarelas
+        .Quadros
+        .Outros
+    - Gravuras:      (imagens)
+        .Xilogravura
+        .Serigrafia
+    - Esculturas: pedra sabão (imagens)
+    - Recorte e colagem (imagem)
+-->
+
+    <main id="outros" class="pagina-ideia-fixa">
+        <h1 class="ideia-titulo">Outros</h1>
+        <p class="ideia-introducao">
+            Uma seleção de trabalhos realizados na área de comunicação visual e arte-final,
+            reunindo projetos e registros do período em que trabalhei na Ideia Fixa Sinalizações.
+            Clique em qualquer imagem para visualizá-la em tela cheia.
+        </p>
+
+                        
+                          <h3 class="sobre-subtitulo">Pinturas</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+            <p class="sobre-paragrafo"></p>      
+                    <p class="cerveja"><strong>Aquarelas:</strong></p>
+                    <p class="sobre-paragrafo"></p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (2).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (3).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (4).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (5).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (6).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (7).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (8).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (9).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (10).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (11).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (12).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (13).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (14).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Aquarelas (15).jpeg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+
+            <p class="sobre-paragrafo"></p>      
+                    <p class="cerveja"><strong>Telas e Quadros:</strong></p>
+                    <p class="sobre-paragrafo"></p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Foto0610 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Foto0612 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Foto0638 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\IMG-20141119-WA0004 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\IMG-20141201-WA0003 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Pigmento em tela (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Pigmento em tela (3).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                    <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\IMG-20141201-WA0003 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Teste (1).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                 <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Pigmento em tela (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\IMG-20141202-WA0010 (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Guaxe e pigmento em tela.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                             <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Guaxe em papel (2).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                      <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Guaxe em papel (1).jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+
+            <p class="sobre-paragrafo"></p>      
+                    <p class="cerveja"><strong>Outros:</strong></p>
+                    <p class="sobre-paragrafo"></p>
+
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+                                      <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\67 gfshujiko.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                  <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Teste (2).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                  <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Teste (3).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                  <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Teste (4).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                                                  <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Pinturas\Teste (5).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+                        
+            <p class="sobre-paragrafo"></p>      
+                          <h3 class="sobre-subtitulo">Gravuras</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Gravura\66-67 fyghj.jpg"" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Gravura\2 xadrez.jpg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Gravura\3 reddragon night.jpg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Gravura\3 volte.jpg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Gravura\EUI.jpg"" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+                          <p class="sobre-paragrafo"></p>
+                          <h3 class="sobre-subtitulo">Esculturas</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Escultura\Coelho (6).jpeg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Escultura\Coelho (5).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+                        <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\Escultura\Castelo (5).jpeg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+                          <p class="sobre-paragrafo"></p>
+                          <h3 class="sobre-subtitulo">Recorte e Colagem</h3>
+                          <p class="sobre-paragrafo">
+              Sempre gostei de explorar a criatividade e encontrar diferentes 
+              maneiras de expressar ideias. Minha vocação vem da infância quando
+              comecei a desenhar. Na faculdade aprimorei técnicas de arte e tomei
+              como foco especial trabalhar na área digital. Desde então tenho explorado
+              a criação de imagens bitmaps, vetoriais, 3d, edição de vídeo e animação, e 
+              recentemente utilizo a I.A. para apoio nos trabalhos sem depender ou 
+              comprometer a essência criativa do toque e humano.
+            </p>
+
+        <section class="ideia-galeria" aria-label="Galeria de trabalhos da Ideia Fixa">
+            <!-- Confira se os arquivos seguem essa numeração e extensão na pasta img.
+                 Se algum nome for diferente, ajuste o src correspondente. -->
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\73 gtdushjin.jpg" alt="Trabalho de comunicação visual da Ideia Fixa" loading="lazy">
+                <figcaption class="ideia-legenda">Comunicação visual</figcaption>
+            </figure>
+            <figure class="ideia-item">
+                <img class="ideia-imagem" src=".\img\8_Outros\61 dragondestroier.jpg" alt="Projeto de sinalização" loading="lazy">
+                <figcaption class="ideia-legenda">Sinalização</figcaption>
+            </figure>
+        </section>
+
+    </main>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Modal: imagem em tela cheia, navegação e zoom até a resolução original -->
+    <div class="visualizador" id="visualizador" role="dialog" aria-modal="true" aria-label="Visualizador de mídia">
+        <button class="visualizador-botao visualizador-fechar" id="fecharVisualizador" aria-label="Fechar imagem">×</button>
+        <button class="visualizador-botao visualizador-zoom" id="alternarZoom">Ver tamanho original</button>
+        <button class="visualizador-botao visualizador-anterior" id="imagemAnterior" aria-label="Imagem anterior">‹</button>
+        <div class="visualizador-conteudo" id="areaImagem">
+            <img class="visualizador-imagem" id="imagemAmpliada" alt="" hidden>
+            <video class="visualizador-video" id="videoAmpliado" controls playsinline hidden></video>
+            <iframe class="visualizador-pdf" id="pdfAmpliado" title="Documento PDF" hidden></iframe>
+            <div id="vrmAmpliado" class="visualizador-vrm" hidden></div>
+            <p id="avisoVisualizador" class="visualizador-aviso" hidden></p>
+        </div>
+        <button class="visualizador-botao visualizador-proxima" id="proximaImagem" aria-label="Próxima imagem">›</button>
+        <div class="visualizador-contador" id="contadorImagem"></div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+                "three/": "https://cdn.jsdelivr.net/npm/three@0.160.0/"
+            }
+        }
+    </script>
+    <script type="module">
+        const visualizador = document.getElementById('visualizador');
+        const areaImagem = document.getElementById('areaImagem');
+        const imagemAmpliada = document.getElementById('imagemAmpliada');
+        const videoAmpliado = document.getElementById('videoAmpliado');
+        const pdfAmpliado = document.getElementById('pdfAmpliado');
+        const vrmAmpliado = document.getElementById('vrmAmpliado');
+        const aviso = document.getElementById('avisoVisualizador');
+        const botaoZoom = document.getElementById('alternarZoom');
+        const contador = document.getElementById('contadorImagem');
+        // Seleciona cada mídia individualmente, inclusive botões VRM que não estão dentro de figure.
+        const itens = Array.from(document.querySelectorAll(
+            '.ideia-galeria .ideia-imagem, .ideia-galeria video, .ideia-galeria [data-media-src]'
+        )).map((el) => {
+            const src = el.dataset.mediaSrc || el.currentSrc || el.src || el.querySelector?.('source')?.src;
+            if (!src) return null;
+            const extensao = (src.split('?')[0].split('.').pop() || '').toLowerCase();
+            const tipo = (el.dataset.mediaType || (el.tagName === 'VIDEO' ? 'video' : extensao)).toLowerCase();
+            return {
+                el, src, tipo,
+                alt: el.alt || el.getAttribute('aria-label') ||
+                    el.querySelector?.('.ideia-midia-nome')?.textContent?.trim() ||
+                    el.closest('figure')?.querySelector('figcaption')?.textContent?.trim() || 'Projeto'
+            };
+        }).filter(Boolean);
+        let indiceAtual = 0, zoomOriginal = false, ultimaFocada = null;
+        let vrmCleanup = null;
+        const tiposImagem = ['jpg','jpeg','png','webp','gif','svg','avif','bmp'];
+
+        function limparConteudo() {
+            if (vrmCleanup) { vrmCleanup(); vrmCleanup = null; }
+            videoAmpliado.pause(); videoAmpliado.removeAttribute('src'); videoAmpliado.load();
+            pdfAmpliado.removeAttribute('src');
+            vrmAmpliado.replaceChildren();
+            [imagemAmpliada, videoAmpliado, pdfAmpliado, vrmAmpliado, aviso].forEach(el => el.hidden = true);
+            imagemAmpliada.classList.remove('zoom-original');
+            areaImagem.classList.remove('fundo-png');
+            botaoZoom.hidden = true;
+        }
+        function mostrarImagem(indice) {
+            if (!itens.length) return;
+            indiceAtual = (indice + itens.length) % itens.length;
+            const item = itens[indiceAtual];
+            limparConteudo(); zoomOriginal = false;
+            contador.textContent = `${indiceAtual + 1} / ${itens.length}`;
+            areaImagem.scrollTop = 0; areaImagem.scrollLeft = 0;
+            const ext = item.tipo.toLowerCase();
+            if (tiposImagem.includes(ext)) {
+                imagemAmpliada.hidden = false; imagemAmpliada.src = item.src; imagemAmpliada.alt = item.alt;
+                botaoZoom.hidden = false; botaoZoom.textContent = 'Ver tamanho original';
+                if (ext === 'png') areaImagem.classList.add('fundo-png');
+            } else if (ext === 'mp4' || ext === 'webm' || ext === 'ogg' || ext === 'video') {
+                videoAmpliado.hidden = false; videoAmpliado.src = item.src; videoAmpliado.load();
+                videoAmpliado.play().catch(() => {});
+            } else if (ext === 'pdf') {
+                pdfAmpliado.hidden = false; pdfAmpliado.src = item.src;
+            } else if (ext === 'vrm') {
+                vrmAmpliado.hidden = false;
+                // Aguarda o modal ficar visível para obter dimensões reais do canvas.
+                requestAnimationFrame(() => abrirModeloVRM(item.src).catch(err => {
+                    console.error('Não foi possível carregar o modelo VRM:', err);
+                    vrmAmpliado.hidden = true; aviso.hidden = false;
+                    aviso.textContent = 'Não foi possível abrir o modelo VRM. Verifique o caminho do arquivo, a conexão com a internet e se a página está sendo executada por um servidor local ou web.';
+                }));
+            } else {
+                aviso.hidden = false; aviso.textContent = `Formato não suportado: ${ext || 'desconhecido'}`;
+            }
+        }
+        async function abrirModeloVRM(src) {
+            // Three.js e three-vrm são carregados por CDN; requer conexão com a internet.
+            // O import map acima resolve o nome "three" usado internamente pelos plugins.
+            const THREE = await import('three');
+            const { GLTFLoader } = await import('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/GLTFLoader.js');
+            const { VRMLoaderPlugin, VRMUtils } = await import('https://cdn.jsdelivr.net/npm/@pixiv/three-vrm@3.3.0/lib/three-vrm.module.js');
+            const host = vrmAmpliado;
+            host.replaceChildren();
+            const scene = new THREE.Scene(); scene.background = new THREE.Color(0x20232a);
+            const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100); camera.position.set(0, 1.35, 3.2);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+            const larguraInicial = Math.max(host.clientWidth, 320);
+            const alturaInicial = Math.max(host.clientHeight, 320);
+            renderer.setSize(larguraInicial, alturaInicial);
+            renderer.domElement.style.width = '100%';
+            renderer.domElement.style.height = '100%';
+            host.appendChild(renderer.domElement);
+            const light = new THREE.DirectionalLight(0xffffff, 2.2); light.position.set(1, 2, 3); scene.add(light);
+            scene.add(new THREE.HemisphereLight(0xffffff, 0x707080, 1.5));
+            const loader = new GLTFLoader(); loader.register(parser => new VRMLoaderPlugin(parser));
+            const gltf = await loader.loadAsync(src); const vrm = gltf.userData.vrm;
+            if (!vrm) throw new Error('Arquivo carregado, mas não foi reconhecido como VRM.');
+            VRMUtils.removeUnnecessaryVertices(gltf.scene); VRMUtils.removeUnnecessaryJoints(gltf.scene);
+            scene.add(vrm.scene);
+            const box = new THREE.Box3().setFromObject(vrm.scene); const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3()); vrm.scene.position.x -= center.x; vrm.scene.position.z -= center.z; vrm.scene.position.y -= box.min.y;
+            const height = Math.max(size.y, 1); camera.position.set(0, height * 0.58, height * 2.8); camera.lookAt(0, height * 0.5, 0);
+            const clock = new THREE.Clock(); let frame, disposed = false;
+            const resize = () => { if (!host.isConnected) return; const w=host.clientWidth||800, h=host.clientHeight||600; camera.aspect=w/h; camera.updateProjectionMatrix(); renderer.setSize(w,h); };
+            const animate = () => { if (disposed) return; frame=requestAnimationFrame(animate); vrm.update(clock.getDelta()); renderer.render(scene,camera); };
+            window.addEventListener('resize', resize); animate();
+            vrmCleanup = () => { disposed=true; cancelAnimationFrame(frame); window.removeEventListener('resize', resize); renderer.dispose(); renderer.domElement.remove(); };
+        }
+        function abrirVisualizador(indice) { ultimaFocada=document.activeElement; visualizador.classList.add('aberto'); document.body.style.overflow='hidden'; document.getElementById('fecharVisualizador').focus(); mostrarImagem(indice); }
+        function fecharVisualizador() { limparConteudo(); visualizador.classList.remove('aberto'); document.body.style.overflow=''; if (ultimaFocada) ultimaFocada.focus(); }
+        function alternarZoom() { if (imagemAmpliada.hidden) return; zoomOriginal=!zoomOriginal; imagemAmpliada.classList.toggle('zoom-original',zoomOriginal); botaoZoom.textContent=zoomOriginal?'Ajustar à tela':'Ver tamanho original'; areaImagem.scrollTop=0; areaImagem.scrollLeft=0; }
+        itens.forEach((item, indice) => item.el.addEventListener('click', () => abrirVisualizador(indice)));
+        document.getElementById('fecharVisualizador').addEventListener('click', fecharVisualizador);
+        botaoZoom.addEventListener('click', alternarZoom); imagemAmpliada.addEventListener('click', alternarZoom);
+        document.getElementById('imagemAnterior').addEventListener('click', () => mostrarImagem(indiceAtual-1));
+        document.getElementById('proximaImagem').addEventListener('click', () => mostrarImagem(indiceAtual+1));
+        visualizador.addEventListener('click', e => { if (e.target===visualizador) fecharVisualizador(); });
+        document.addEventListener('keydown', e => { if (!visualizador.classList.contains('aberto')) return; if(e.key==='Escape') fecharVisualizador(); if(e.key==='ArrowLeft') mostrarImagem(indiceAtual-1); if(e.key==='ArrowRight') mostrarImagem(indiceAtual+1); });
+    </script>
+
+
+
+
+
+
+
+
+
+
+
+</body>
+</html>

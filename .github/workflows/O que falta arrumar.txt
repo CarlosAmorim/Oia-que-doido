@@ -1,0 +1,27 @@
+Arrumar o zoom que antes estava cortando na parte superior da imagem, agora corta na lateral esquerda. Quero modificar esta funcionalidade com um controle de zoom personalizável, pois algumas imagens quando solicito o zoom até o tamanho original ela não sofre nenhuma ampliação.
+
+Quando clico para visualizar o arquivo vrm gostaria que tivesse uma funcionalidade para dar zoom, mover a tela e se possível também alterar suas expressões faciais, pose, iluminação e até alguns movimentos simples.
+
+O menu fixo na parte superior da tela também deveria estar responsivo para que fosse visível todos os atalhos de navegação pela página.
+
+Conferir e arrumar todos os textos
+
+Conferir e arrumar todas as imagens para quantidade em colunas
+
+
+    Para abrir o arquivo com os avatares 3d e o JOGO
+    . Abra o cmd na pasta e digite:
+    python -m http.server 8000
+
+    . Abra o navegador e digite:
+    http://localhost:8000/projetos.html
+
+
+	Para dar um espaço entre os capítulos:
+        <!--<h3 class="sobre-subtitulo"></h3>-->
+        <p class="sobre-paragrafo"></p>      
+
+
+
+
+  Obra realizada para...
